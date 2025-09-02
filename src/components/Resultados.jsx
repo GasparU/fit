@@ -213,6 +213,7 @@ export const Resultados = ({
       "tmb",
       "tdee",
       "objetivo",
+      "energiaTotal",
       "agua",
       "grasa",
       "cardio",

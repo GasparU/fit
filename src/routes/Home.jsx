@@ -38,6 +38,12 @@ export const Home = () => {
     energiaTotalResult
   );
 
+  const [columnOrder, setColumnOrder] = useState([
+    "resultados",
+    "busqueda",
+    "resumen",
+  ]);
+
   const handleUserDataChange = (field, value) => {
     setUserData((prev) => ({
       ...prev,
@@ -57,6 +63,22 @@ export const Home = () => {
     }
   };
 
+  // Manejador para el fin del arrastre
+  const handleDragEnd = (result) => {
+    if (!result.destination) return;
+
+    const fromIndex = result.source.index;
+    const toIndex = result.destination.index;
+
+    if (fromIndex === toIndex) return;
+
+    const newOrder = [...columnOrder];
+    const [movedColumn] = newOrder.splice(fromIndex, 1);
+    newOrder.splice(toIndex, 0, movedColumn);
+
+    setColumnOrder(newOrder);
+  };
+
   // Estilos dinámicos para todas las columnas
   const textStyle = {
     fontSize: `${fontSize}px`,
@@ -72,6 +94,53 @@ export const Home = () => {
 
   const smallTextStyle = {
     fontSize: `${fontSize - 2}px`,
+  };
+
+  // Mapeo de IDs de columnas a componentes
+  const columnComponents = {
+    resultados: (
+      <div className="bg-white rounded-lg shadow p-3 md:p-4 h-full">
+        <Resultados
+          imcResult={imcResult}
+          tmbResult={tmbResult}
+          tdeeResult={tdeeResult}
+          objetivoResult={objetivoResult}
+          energiaTotalResult={energiaTotalResult}
+          aguaResult={aguaResult}
+          grasaCorporalResult={grasaCorporalResult}
+          cardioResult={cardioResult}
+          userData={userData}
+          fontSize={fontSize}
+        />
+      </div>
+    ),
+    busqueda: (
+      <div className="bg-white rounded-lg shadow p-3 md:p-4 h-full">
+        <BusquedaComida
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          selectedFoods={selectedFoods}
+          setSelectedFoods={setSelectedFoods}
+          filtroSaciedad={filtroSaciedad}
+          setFiltroSaciedad={setFiltroSaciedad}
+          filtroGlucemia={filtroGlucemia}
+          setFiltroGlucemia={setFiltroGlucemia}
+          fontSize={fontSize}
+        />
+      </div>
+    ),
+    resumen: (
+      <div className="bg-white rounded-lg shadow p-3 md:p-4 h-full">
+        <ResumenNutricional selectedFoods={selectedFoods} fontSize={fontSize} />
+      </div>
+    ),
+  };
+
+  // Títulos de las columnas
+  const columnTitles = {
+    resultados: "Resultados",
+    busqueda: "Búsqueda de Alimentos",
+    resumen: "Resumen Nutricional",
   };
 
   return (

@@ -74,7 +74,7 @@ export const ResumenNutricional = ({ selectedFoods, fontSize = 14 }) => {
               </p>
             </div>
 
-            <div className="bg-green-50 p-3 rounded-md transition-all duration-300 hover:bg-green-100">
+            {/* <div className="bg-green-50 p-3 rounded-md transition-all duration-300 hover:bg-green-100">
               <h3 className="font-medium text-green-800" style={textStyle}>
                 Proteínas Total
               </h3>
@@ -99,12 +99,12 @@ export const ResumenNutricional = ({ selectedFoods, fontSize = 14 }) => {
               <p className="font-bold text-yellow-600" style={numberStyle}>
                 {totalNutrients.carbohidratos_disp.toFixed(1)}g
               </p>
-            </div>
+            </div> */}
           </div>
 
           {/* Información adicional */}
           <div className="space-y-3">
-            {totalNutrients.fibra > 0 && (
+            {/* {totalNutrients.fibra > 0 && (
               <div className="bg-indigo-50 p-3 rounded-md transition-all duration-300 hover:bg-indigo-100">
                 <h3 className="font-medium text-indigo-800" style={textStyle}>
                   Fibra Dietética
@@ -124,7 +124,7 @@ export const ResumenNutricional = ({ selectedFoods, fontSize = 14 }) => {
                   {totalNutrients.agua.toFixed(1)}ml
                 </p>
               </div>
-            )}
+            )} */}
 
             {totalNutrients.carbohidratos > 0 && (
               <div className="bg-orange-50 p-3 rounded-md transition-all duration-300 hover:bg-orange-100">
