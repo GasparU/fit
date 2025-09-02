@@ -1,13 +1,14 @@
 // ResumenNutricional.jsx (actualizado)
-import { useMemo } from "react";
 
-export const ResumenNutricional = ({ selectedFoods, fontSize = 14 }) => {
-  // Función para convertir valores a número de forma segura
-  const safeParseFloat = (value) => {
-    if (value === null || value === undefined || value === "") return 0;
-    const parsed = parseFloat(value);
-    return isNaN(parsed) ? 0 : parsed;
-  };
+import { ResumenKcalPeso } from "./resumen/ResumenKcalPeso";
+
+export const ResumenNutricional = ({
+  selectedFoods,
+  userData,
+  grasaCorporalResult,
+  fontSize = 14,
+}) => {
+  
 
   // Estilos dinámicos
   const textStyle = {
@@ -18,39 +19,6 @@ export const ResumenNutricional = ({ selectedFoods, fontSize = 14 }) => {
     fontSize: `${fontSize + 2}px`,
   };
 
-  const numberStyle = {
-    fontSize: `${fontSize + 4}px`,
-  };
-
-  // Calcular totales nutricionales con proporción según cantidad
-  const totalNutrients = useMemo(() => {
-    return selectedFoods.reduce(
-      (totals, food) => {
-        const factor = food.cantidad / 100;
-        return {
-          energia: totals.energia + safeParseFloat(food.energia) * factor,
-          proteinas: totals.proteinas + safeParseFloat(food.proteinas) * factor,
-          carbohidratos_disp:
-            totals.carbohidratos_disp +
-            safeParseFloat(food.carbohidratos_disp) * factor,
-          carbohidratos:
-            totals.carbohidratos + safeParseFloat(food.carbohidratos) * factor,
-          grasas: totals.grasas + safeParseFloat(food.grasas) * factor,
-          agua: totals.agua + safeParseFloat(food.agua) * factor,
-          fibra: totals.fibra + safeParseFloat(food.fibra_diet) * factor,
-        };
-      },
-      {
-        energia: 0,
-        proteinas: 0,
-        carbohidratos_disp: 0,
-        carbohidratos: 0,
-        grasas: 0,
-        agua: 0,
-        fibra: 0,
-      }
-    );
-  }, [selectedFoods]);
 
   return (
     <div className="bg-white rounded-lg shadow p-3 md:p-4 h-full flex flex-col">
@@ -125,17 +93,6 @@ export const ResumenNutricional = ({ selectedFoods, fontSize = 14 }) => {
                 </p>
               </div>
             )} */}
-
-            {totalNutrients.carbohidratos > 0 && (
-              <div className="bg-orange-50 p-3 rounded-md transition-all duration-300 hover:bg-orange-100">
-                <h3 className="font-medium text-orange-800" style={textStyle}>
-                  Carbohidratos Totales
-                </h3>
-                <p className="font-bold text-orange-600" style={numberStyle}>
-                  {totalNutrients.carbohidratos.toFixed(1)}g
-                </p>
-              </div>
-            )}
           </div>
 
           {/* Resumen de alimentos */}
@@ -157,6 +114,13 @@ export const ResumenNutricional = ({ selectedFoods, fontSize = 14 }) => {
           </div>
         </>
       )}
+      
+      <ResumenKcalPeso
+        selectedFoods={selectedFoods}
+        grasaCorporalResult={grasaCorporalResult}
+        fontSize={fontSize}
+        userData={userData}
+      />
     </div>
   );
 };

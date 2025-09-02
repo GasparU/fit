@@ -143,7 +143,7 @@ export const useCalculosNutricionales = (userData) => {
       } else {
         const pesoIdeal =
           tmbResult?.pesoIdeal ||
-          22 * Math.pow(parseFloat(userData.talla) / 100, 2);
+          24 * Math.pow(parseFloat(userData.talla) / 100, 2);
         aguaBase = pesoIdeal * 30 + (peso - pesoIdeal) * 10;
       }
 

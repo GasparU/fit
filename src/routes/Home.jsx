@@ -5,6 +5,13 @@ import { BusquedaComida } from "../components/BusquedaComida";
 import { ResumenNutricional } from "../components/ResumenNutricional";
 import { useCalculosNutricionales } from "../hooks/useCalculosNutricionales";
 import { useCalculosCardio } from "../hooks/useCalculosCardio";
+import { Buttons } from "./Elements/Buttons";
+import { DatosUser } from "./Elements/DatosUser";
+import { ActividadUser } from "./Elements/ActividadUser";
+import { ImcUser } from "./Elements/ImcUser";
+import { FrecuenciaCardiacaUser } from "./Elements/FrecuenciaCardiacaUser";
+import { ObjetivosPlanUser } from "./Elements/ObjetivosPlanUser";
+import { DistribucionMacronutrientes } from "./Elements/DistribucionMacronutrientes";
 
 export const Home = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -13,15 +20,18 @@ export const Home = () => {
   const [filtroGlucemia, setFiltroGlucemia] = useState("");
   const [fontSize, setFontSize] = useState(14);
   const [userData, setUserData] = useState({
-    edad: "",
-    sexo: "hombre",
-    talla: "",
-    peso: "",
-    imcObjetivo: 22,
-    diasActividad: 0,
-    porcentajeCardio: 70,
-    objetivoPlan: "recomposicion",
-    porcentajeObjetivo: 10,
+     edad: "",
+  sexo: "hombre",
+  talla: "",
+  peso: "",
+  imcObjetivo: 22,
+  diasActividad: 0,
+  porcentajeCardio: 70,
+  objetivoPlan: "recomposicion",
+  porcentajeObjetivo: 10,
+  proteinas: "",
+  carbohidratos: "",
+  grasas: ""
   });
 
   const {
@@ -50,33 +60,34 @@ export const Home = () => {
       [field]: value,
     }));
   };
-
-  const increaseFontSize = () => {
-    if (fontSize < 28) {
-      setFontSize(fontSize + 2);
+  // Función para calcular los rangos de macronutrientes según el objetivo
+  const getMacroRanges = () => {
+    switch (userData.objetivoPlan) {
+      case "deficit":
+        return {
+          proteinas: { min: 1.6, max: 2.4, porcentaje: "20-30%" },
+          carbohidratos: { min: 3, max: 4, porcentaje: "40-50%" },
+          grasas: { min: 0.8, max: 1, porcentaje: "20-30%" },
+        };
+      case "recomposicion":
+        return {
+          proteinas: { min: 1.7, max: 2.4, porcentaje: "25-30%" },
+          carbohidratos: { min: 4, max: 5, porcentaje: "40-50%" },
+          grasas: { min: 0.5, max: 0.5, porcentaje: "15-25%" },
+        };
+      case "aumento":
+        return {
+          proteinas: { min: 1.6, max: 2.4, porcentaje: "20-30%" },
+          carbohidratos: { min: 5, max: 6, porcentaje: "45-55%" },
+          grasas: { min: 0.5, max: 0.5, porcentaje: "20-30%" },
+        };
+      default:
+        return {
+          proteinas: { min: 1.6, max: 2.4, porcentaje: "20-30%" },
+          carbohidratos: { min: 3, max: 4, porcentaje: "40-50%" },
+          grasas: { min: 0.8, max: 1, porcentaje: "20-30%" },
+        };
     }
-  };
-
-  const decreaseFontSize = () => {
-    if (fontSize > 14) {
-      setFontSize(fontSize - 2);
-    }
-  };
-
-  // Manejador para el fin del arrastre
-  const handleDragEnd = (result) => {
-    if (!result.destination) return;
-
-    const fromIndex = result.source.index;
-    const toIndex = result.destination.index;
-
-    if (fromIndex === toIndex) return;
-
-    const newOrder = [...columnOrder];
-    const [movedColumn] = newOrder.splice(fromIndex, 1);
-    newOrder.splice(toIndex, 0, movedColumn);
-
-    setColumnOrder(newOrder);
   };
 
   // Estilos dinámicos para todas las columnas
@@ -96,46 +107,7 @@ export const Home = () => {
     fontSize: `${fontSize - 2}px`,
   };
 
-  // Mapeo de IDs de columnas a componentes
-  const columnComponents = {
-    resultados: (
-      <div className="bg-white rounded-lg shadow p-3 md:p-4 h-full">
-        <Resultados
-          imcResult={imcResult}
-          tmbResult={tmbResult}
-          tdeeResult={tdeeResult}
-          objetivoResult={objetivoResult}
-          energiaTotalResult={energiaTotalResult}
-          aguaResult={aguaResult}
-          grasaCorporalResult={grasaCorporalResult}
-          cardioResult={cardioResult}
-          userData={userData}
-          fontSize={fontSize}
-        />
-      </div>
-    ),
-    busqueda: (
-      <div className="bg-white rounded-lg shadow p-3 md:p-4 h-full">
-        <BusquedaComida
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          selectedFoods={selectedFoods}
-          setSelectedFoods={setSelectedFoods}
-          filtroSaciedad={filtroSaciedad}
-          setFiltroSaciedad={setFiltroSaciedad}
-          filtroGlucemia={filtroGlucemia}
-          setFiltroGlucemia={setFiltroGlucemia}
-          fontSize={fontSize}
-        />
-      </div>
-    ),
-    resumen: (
-      <div className="bg-white rounded-lg shadow p-3 md:p-4 h-full">
-        <ResumenNutricional selectedFoods={selectedFoods} fontSize={fontSize} />
-      </div>
-    ),
-  };
-
+  
   // Títulos de las columnas
   const columnTitles = {
     resultados: "Resultados",
@@ -155,27 +127,12 @@ export const Home = () => {
         </p>
       </header>
 
-      {/* Botones de control de tamaño a la izquierda */}
-      <div className="flex justify-start mb-3">
-        <div className="bg-white rounded-lg shadow-sm p-2 flex items-center">
-          <span className="text-gray-600 mr-2 text-sm">Tamaño de texto:</span>
-          <button
-            onClick={decreaseFontSize}
-            disabled={fontSize <= 14}
-            className="bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-full w-7 h-7 flex items-center justify-center mr-1 text-xs disabled:opacity-50"
-          >
-            A-
-          </button>
-          <button
-            onClick={increaseFontSize}
-            disabled={fontSize >= 28}
-            className="bg-green-500 hover:bg-green-600 text-white rounded-full w-7 h-7 flex items-center justify-center text-xs disabled:opacity-50"
-          >
-            A+
-          </button>
-          <span className="text-gray-600 ml-2 text-xs">{fontSize}px</span>
-        </div>
-      </div>
+      <Buttons
+        fontSize={fontSize}
+        handleUserDataChange={handleUserDataChange}
+        userData={userData}
+        setFontSize={setFontSize}
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         {/* Columna 1: Datos del usuario */}
@@ -185,174 +142,48 @@ export const Home = () => {
           </h2>
 
           <div className="space-y-2 flex-grow overflow-y-auto">
-            <div>
-              <label className="block text-gray-700 mb-1" style={textStyle}>
-                Edad
-              </label>
-              <input
-                type="number"
-                value={userData.edad}
-                onChange={(e) => handleUserDataChange("edad", e.target.value)}
-                className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-300 focus:border-green-400 transition-all"
-                placeholder="Años"
-                style={textStyle}
-              />
-            </div>
+            <DatosUser
+              userData={userData}
+              fontSize={fontSize}
+              handleUserDataChange={handleUserDataChange}
+            />
 
-            <div>
-              <label className="block text-gray-700 mb-1" style={textStyle}>
-                Sexo
-              </label>
-              <select
-                value={userData.sexo}
-                onChange={(e) => handleUserDataChange("sexo", e.target.value)}
-                className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-300 focus:border-green-400 transition-all"
-                style={textStyle}
-              >
-                <option value="hombre">Hombre</option>
-                <option value="mujer">Mujer</option>
-              </select>
-            </div>
+            <ActividadUser
+              userData={userData}
+              handleUserDataChange={handleUserDataChange}
+              fontSize={fontSize}
+              textStyle={textStyle}
+              smallTextStyle={smallTextStyle}
+            />
 
-            <div>
-              <label className="block text-gray-700 mb-1" style={textStyle}>
-                Talla (cm)
-              </label>
-              <input
-                type="number"
-                value={userData.talla}
-                onChange={(e) => handleUserDataChange("talla", e.target.value)}
-                className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-300 focus:border-green-400 transition-all"
-                placeholder="Centímetros"
-                style={textStyle}
-              />
-            </div>
+            <ImcUser
+              userData={userData}
+              smallTextStyle={smallTextStyle}
+              imcResult={imcResult}
+              textStyle={textStyle}
+              handleUserDataChange={handleUserDataChange}
+            />
 
-            <div>
-              <label className="block text-gray-700 mb-1" style={textStyle}>
-                Peso (kg)
-              </label>
-              <input
-                type="number"
-                value={userData.peso}
-                onChange={(e) => handleUserDataChange("peso", e.target.value)}
-                className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-300 focus:border-green-400 transition-all"
-                placeholder="Kilogramos"
-                style={textStyle}
-              />
-            </div>
+            <FrecuenciaCardiacaUser
+              handleUserDataChange={handleUserDataChange}
+              userData={userData}
+              textStyle={textStyle}
+            />
 
-            <div>
-              <label className="block text-gray-700 mb-1" style={textStyle}>
-                Días de actividad física por semana
-              </label>
-              <input
-                type="number"
-                min="0"
-                max="7"
-                value={userData.diasActividad}
-                onChange={(e) =>
-                  handleUserDataChange("diasActividad", e.target.value)
-                }
-                className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-300 focus:border-green-400 transition-all"
-                style={textStyle}
-              />
-              <div className="text-gray-500 mt-1" style={smallTextStyle}>
-                0: Sedentario | 2-3: Ligero | 4-5: Moderado | 6+: Intenso
-              </div>
-            </div>
+            <ObjetivosPlanUser
+              textStyle={textStyle}
+              handleUserDataChange={handleUserDataChange}
+              userData={userData}
+              smallTextStyle={smallTextStyle}
+            />
 
-            {imcResult && parseFloat(imcResult.value) >= 30 && (
-              <div>
-                <label className="block text-gray-700 mb-1" style={textStyle}>
-                  IMC Objetivo (18.5-24.9)
-                  <span className="text-gray-500 ml-1" style={smallTextStyle}>
-                    (para cálculo de TMB en obesidad)
-                  </span>
-                </label>
-                <input
-                  type="number"
-                  min="18.5"
-                  max="24.9"
-                  step="0.1"
-                  value={userData.imcObjetivo}
-                  onChange={(e) =>
-                    handleUserDataChange("imcObjetivo", e.target.value)
-                  }
-                  className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-300 focus:border-green-400 transition-all"
-                  style={textStyle}
-                />
-              </div>
-            )}
-
-            <div>
-              <label className="block text-gray-700 mb-1" style={textStyle}>
-                Frecuencia Cardiaca Objetivo
-              </label>
-              <select
-                value={userData.porcentajeCardio}
-                onChange={(e) =>
-                  handleUserDataChange("porcentajeCardio", e.target.value)
-                }
-                className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-300 focus:border-green-400 transition-all"
-                style={textStyle}
-              >
-                <option value="55">50-60% (Muy Suave)</option>
-                <option value="65">61-70% (Suave)</option>
-                <option value="75">71-80% (Moderado)</option>
-                <option value="85">81-90% (Intenso)</option>
-                <option value="95">91-100% (Máximo)</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-gray-700 mb-1" style={textStyle}>
-                Objetivos del Plan
-              </label>
-              <select
-                value={userData.objetivoPlan}
-                onChange={(e) =>
-                  handleUserDataChange("objetivoPlan", e.target.value)
-                }
-                className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-300 focus:border-green-400 transition-all"
-                style={textStyle}
-              >
-                <option value="recomposicion">Recomposición Corporal</option>
-                <option value="deficit">Déficit Calórico</option>
-                <option value="aumento">Aumento de Masa Muscular</option>
-              </select>
-            </div>
-
-            {(userData.objetivoPlan === "deficit" ||
-              userData.objetivoPlan === "aumento") && (
-              <div>
-                <label className="block text-gray-700 mb-1" style={textStyle}>
-                  {userData.objetivoPlan === "deficit"
-                    ? "Déficit Calórico"
-                    : "Superávit Calórico"}{" "}
-                  (%)
-                </label>
-                <select
-                  value={userData.porcentajeObjetivo}
-                  onChange={(e) =>
-                    handleUserDataChange("porcentajeObjetivo", e.target.value)
-                  }
-                  className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-300 focus:border-green-400 transition-all"
-                  style={textStyle}
-                >
-                  <option value="5">5%</option>
-                  <option value="10">10%</option>
-                  <option value="15">15%</option>
-                  <option value="20">20%</option>
-                  <option value="25">25%</option>
-                </select>
-                <div className="text-gray-500 mt-1" style={smallTextStyle}>
-                  {userData.objetivoPlan === "deficit"
-                    ? "Porcentaje de reducción calórica para pérdida de grasa"
-                    : "Porcentaje de aumento calórico para ganancia muscular"}
-                </div>
-              </div>
-            )}
+            <DistribucionMacronutrientes
+              getMacroRanges={getMacroRanges}
+              textStyle={textStyle}
+              userData={userData}
+              handleUserDataChange={handleUserDataChange}
+              smallTextStyle={smallTextStyle}
+            />
           </div>
         </div>
 
@@ -391,6 +222,8 @@ export const Home = () => {
         <div className="bg-white rounded-lg shadow p-3 md:p-4">
           <ResumenNutricional
             selectedFoods={selectedFoods}
+            userData={userData}
+            grasaCorporalResult={grasaCorporalResult}
             fontSize={fontSize}
           />
         </div>
