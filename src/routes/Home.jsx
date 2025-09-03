@@ -225,6 +225,9 @@ export const Home = () => {
             userData={userData}
             grasaCorporalResult={grasaCorporalResult}
             fontSize={fontSize}
+            energiaTotalResult={energiaTotalResult}
+            objetivoResult={objetivoResult}
+            numberStyle={numberStyle}
           />
         </div>
       </div>
