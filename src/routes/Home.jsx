@@ -13,6 +13,7 @@ import { FrecuenciaCardiacaUser } from "./Elements/FrecuenciaCardiacaUser";
 import { ObjetivosPlanUser } from "./Elements/ObjetivosPlanUser";
 import { DistribucionMacronutrientes } from "./Elements/DistribucionMacronutrientes";
 import { useDynamicStyles } from './../hooks/useDynamicStyles';
+import logo2 from "/NutriGymAMG.png"
 
 export const Home = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -21,18 +22,19 @@ export const Home = () => {
   const [filtroGlucemia, setFiltroGlucemia] = useState("");
   const [fontSize, setFontSize] = useState(14);
   const [userData, setUserData] = useState({
-  edad: "",
-  sexo: "hombre",
-  talla: "",
-  peso: "",
-  imcObjetivo: 22,
-  diasActividad: 0,
-  porcentajeCardio: 70,
-  objetivoPlan: "recomposicion",
-  porcentajeObjetivo: 10,
-  proteinas: "",
-  carbohidratos: "",
-  grasas: ""
+    edad: "",
+    sexo: "hombre",
+    talla: "",
+    peso: "",
+    imcObjetivo: 22,
+    diasActividad: 0,
+    porcentajeCardio: 75,
+    nivelCardio: "Moderado",
+    objetivoPlan: "recomposicion",
+    porcentajeObjetivo: 10,
+    proteinas: "",
+    carbohidratos: "",
+    grasas: "",
   });
 
   const {
@@ -100,12 +102,20 @@ export const Home = () => {
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-cyan-50 p-2 md:p-4">
       {/* Encabezado con colores llamativos */}
       <header className="text-center mb-4 py-3 bg-gradient-to-r from-green-500 to-teal-500 rounded-lg shadow-md">
-        <h1 className="text-xl md:text-2xl font-bold text-white">
-          Herramienta Nutricional para Gimnasio
-        </h1>
-        {/* <p className="text-white text-sm md:text-base mt-1">
-          Herramienta para profesionales de la salud y fitness
-        </p> */}
+        <div className="flex items-center justify-center">
+          {/* Logo - Visible en todos los dispositivos */}
+          <img
+            src={logo2}
+            alt="Logo Nutricional"
+            className="h-20 w-20 md:h-16 md:w-16 lg:h-20 lg:w-20 xl:h-24 xl:w-24 object-contain"
+          />
+          {/* Texto - Oculto en móviles, visible en tablets y superiores */}
+          <div className="hidden md:block ml-3">
+            <h1 className="text-xl md:text-2xl font-bold text-white">
+              Herramienta Nutricional para Gimnasio
+            </h1>
+          </div>
+        </div>
       </header>
 
       <Buttons
@@ -210,7 +220,7 @@ export const Home = () => {
             objetivoResult={objetivoResult}
             numberStyle={numberStyle}
           />
-        </div>       
+        </div>
       </div>
     </div>
   );

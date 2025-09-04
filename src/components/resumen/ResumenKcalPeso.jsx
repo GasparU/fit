@@ -30,12 +30,15 @@ export const ResumenKcalPeso = ({
 
   return (
     <div className="mt-4 pt-4 border-t border-gray-200">
-      <h3 className="font-medium mb-2 text-gray-700" style={titleStyle}>
+      <h3
+        className="font-medium mb-2 text-gray-700 cursor-grab"
+        style={titleStyle}
+      >
         Distribución de Macronutrientes Objetivo
       </h3>
 
       <div className="mb-3 bg-gray-50 p-3 rounded-md">
-        <h4 className="font-medium text-gray-800" style={textStyle}>
+        <h4 className="font-medium text-gray-800 cursor-grab" style={textStyle}>
           Calorías Objetivo: {caloriasObjetivo.toFixed(0)} kcal
         </h4>
         <p className="text-gray-600 text-sm" style={smallTextStyle}>
@@ -51,7 +54,10 @@ export const ResumenKcalPeso = ({
       {macroNutrientes && energiaTotalResult?.value && (
         <div className="grid grid-cols-1 gap-3">
           <div className="bg-blue-50 p-3 rounded-md">
-            <h4 className="font-medium text-blue-800" style={textStyle}>
+            <h4
+              className="font-medium text-blue-800 cursor-grab"
+              style={textStyle}
+            >
               Proteínas
             </h4>
             <p className="font-bold text-blue-600" style={numberStyle}>
