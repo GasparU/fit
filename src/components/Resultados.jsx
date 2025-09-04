@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 // Resultados.jsx - REEMPLAZA TODO el código del componente con esto:
 export const Resultados = ({
@@ -161,7 +162,7 @@ export const Resultados = ({
     "objetivo",
     "agua",
     "grasa",
-    "cardio", 
+    "cardio",
   ]);
 
   // Estado para el arrastre
@@ -182,9 +183,20 @@ export const Resultados = ({
     }
   };
 
-  const handleDragEnd = () => {
-    setDraggingId(null);
-    setDragOverId(null);
+  // const handleDragEnd = () => {
+  //   setDraggingId(null);
+  //   setDragOverId(null);
+  // };
+
+  // Función para manejar el fin del arrastre
+  const handleDragEnd = (result) => {
+    if (!result.destination) return;
+
+    const items = Array.from(elementOrder);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+
+    setElementOrder(items);
   };
 
   const handleDrop = (e, targetId) => {
@@ -235,83 +247,153 @@ export const Resultados = ({
 
   // Mapeo de IDs a componentes
   const componentMap = {
+    // imc: hasValue(imcResult) && (
+    //   <div
+    //     key="imc"
+    //     draggable
+    //     onDragStart={(e) => handleDragStart(e, "imc")}
+    //     onDragOver={(e) => handleDragOver(e, "imc")}
+    //     onDragEnd={handleDragEnd}
+    //     onDrop={(e) => handleDrop(e, "imc")}
+    //     className={`p-2 rounded-md border transition-all duration-500 ease-in-out ${
+    //       imcResult.colorClass || "bg-gray-50 border-gray-200"
+    //     } ${draggingId === "imc" ? "opacity-50" : ""} ${
+    //       dragOverId === "imc" ? "border-2 border-dashed border-blue-400" : ""
+    //     }`}
+    //   >
+    //     <h3 className="font-medium" style={textStyle}>
+    //       Índice de Masa Corporal (IMC)
+    //     </h3>
+    //     <p className="font-bold" style={numberStyle}>
+    //       {imcResult.value}
+    //     </p>
+    //     <p style={textStyle}>{imcResult.classification}</p>
+    //   </div>
+    // ),
+
     imc: hasValue(imcResult) && (
       <div
-        key="imc"
-        draggable
-        onDragStart={(e) => handleDragStart(e, "imc")}
-        onDragOver={(e) => handleDragOver(e, "imc")}
-        onDragEnd={handleDragEnd}
-        onDrop={(e) => handleDrop(e, "imc")}
         className={`p-2 rounded-md border transition-all duration-500 ease-in-out ${
           imcResult.colorClass || "bg-gray-50 border-gray-200"
-        } ${draggingId === "imc" ? "opacity-50" : ""} ${
-          dragOverId === "imc" ? "border-2 border-dashed border-blue-400" : ""
         }`}
       >
-        <h3 className="font-medium" style={textStyle}>
-          Índice de Masa Corporal (IMC)
-        </h3>
-        <p className="font-bold" style={numberStyle}>
-          {imcResult.value}
-        </p>
-        <p style={textStyle}>{imcResult.classification}</p>
+        <div className="cursor-grab active:cursor-grabbing py-1">
+          <h3 className="font-medium" style={textStyle}>
+            Índice de Masa Corporal (IMC)
+          </h3>
+        </div>
+        <div className="pt-1">
+          <p className="font-bold" style={numberStyle}>
+            {imcResult.value}
+          </p>
+          <p style={textStyle}>{imcResult.classification}</p>
+        </div>
       </div>
     ),
 
+    // tmb: hasValue(tmbResult) && (
+    //   <div
+    //     key="tmb"
+    //     draggable
+    //     onDragStart={(e) => handleDragStart(e, "tmb")}
+    //     onDragOver={(e) => handleDragOver(e, "tmb")}
+    //     onDragEnd={handleDragEnd}
+    //     onDrop={(e) => handleDrop(e, "tmb")}
+    //     className={`p-2 rounded-md bg-indigo-50 border border-indigo-200 transition-all duration-500 ease-in-out ${
+    //       draggingId === "tmb" ? "opacity-50" : ""
+    //     } ${
+    //       dragOverId === "tmb" ? "border-2 border-dashed border-blue-400" : ""
+    //     }`}
+    //   >
+    //     <h3
+    //       className="font-medium text-indigo-800 flex items-center"
+    //       style={textStyle}
+    //     >
+    //       Tasa Metabólica Basal (TMB)
+    //       <div className="relative group ml-1">
+    //         <span className="bg-indigo-200 text-indigo-800 rounded-full h-4 w-4 flex items-center justify-center cursor-help text-xs">
+    //           ?
+    //         </span>
+    //         <div className="absolute invisible group-hover:visible z-50 w-64 p-2 bg-white border border-gray-200 rounded-md shadow-lg text-xs text-gray-600 left-0 -translate-x-1/4 mt-1">
+    //           {tmbResult.formula && tmbResult.formula.includes("Hombres") ? (
+    //             <>
+    //               Fórmula de Katch–McArdle
+    //               <br></br>
+    //               TMB Hombres = 10 × Peso(kg) + 6.25 × Altura(cm) - 5 ×
+    //               Edad(años) + 5
+    //             </>
+    //           ) : (
+    //             <>
+    //               Fórmula de Mifflin-ST Jeor
+    //               <br></br>
+    //               TMB Mujeres = 10 × Peso(kg) + 6.25 × Altura(cm) - 5 ×
+    //               Edad(años) - 161
+    //             </>
+    //           )}
+    //           {tmbResult.formula && tmbResult.formula.includes("obesidad") && (
+    //             <>
+    //               <br />
+    //               Peso ajustado = Peso ideal + 0.25 × (Peso real - Peso ideal)
+    //               <br />
+    //               Peso ideal = IMC objetivo × (Altura(m))²
+    //             </>
+    //           )}
+    //         </div>
+    //       </div>
+    //     </h3>
+    //     <p className="font-bold text-indigo-600" style={numberStyle}>
+    //       {tmbResult.value} kcal
+    //     </p>
+    //   </div>
+    // ),
+
     tmb: hasValue(tmbResult) && (
-      <div
-        key="tmb"
-        draggable
-        onDragStart={(e) => handleDragStart(e, "tmb")}
-        onDragOver={(e) => handleDragOver(e, "tmb")}
-        onDragEnd={handleDragEnd}
-        onDrop={(e) => handleDrop(e, "tmb")}
-        className={`p-2 rounded-md bg-indigo-50 border border-indigo-200 transition-all duration-500 ease-in-out ${
-          draggingId === "tmb" ? "opacity-50" : ""
-        } ${
-          dragOverId === "tmb" ? "border-2 border-dashed border-blue-400" : ""
-        }`}
-      >
-        <h3
-          className="font-medium text-indigo-800 flex items-center"
-          style={textStyle}
-        >
-          Tasa Metabólica Basal (TMB)
-          <div className="relative group ml-1">
-            <span className="bg-indigo-200 text-indigo-800 rounded-full h-4 w-4 flex items-center justify-center cursor-help text-xs">
-              ?
-            </span>
-            <div className="absolute invisible group-hover:visible z-50 w-64 p-2 bg-white border border-gray-200 rounded-md shadow-lg text-xs text-gray-600 left-0 -translate-x-1/4 mt-1">
-              {tmbResult.formula && tmbResult.formula.includes("Hombres") ? (
-                <>
-                  Fórmula de Katch–McArdle
-                  <br></br>
-                  TMB Hombres = 10 × Peso(kg) + 6.25 × Altura(cm) - 5 ×
-                  Edad(años) + 5
-                </>
-              ) : (
-                <>
-                  Fórmula de Mifflin-ST Jeor 
-                  <br></br>
-                  TMB Mujeres = 10 × Peso(kg) + 6.25
-                  × Altura(cm) - 5 × Edad(años) - 161
-                </>
-              )}
-              {tmbResult.formula && tmbResult.formula.includes("obesidad") && (
-                <>
-                  <br />
-                  Peso ajustado = Peso ideal + 0.25 × (Peso real - Peso ideal)
-                  <br />
-                  Peso ideal = IMC objetivo × (Altura(m))²
-                </>
-              )}
+      <div className="p-2 rounded-md bg-indigo-50 border border-indigo-200 transition-all duration-500 ease-in-out">
+        <div className="cursor-grab active:cursor-grabbing py-1">
+          <h3
+            className="font-medium text-indigo-800 flex items-center"
+            style={textStyle}
+          >
+            Tasa Metabólica Basal (TMB)
+            <div className="relative group ml-1">
+              <span className="bg-indigo-200 text-indigo-800 rounded-full h-4 w-4 flex items-center justify-center cursor-help text-xs">
+                ?
+              </span>
+              <div className="absolute invisible group-hover:visible z-50 w-64 p-2 bg-white border border-gray-200 rounded-md shadow-lg text-xs text-gray-600 left-0 -translate-x-1/4 mt-1">
+                {tmbResult.formula && tmbResult.formula.includes("Hombres") ? (
+                  <>
+                    Fórmula de Katch–McArdle
+                    <br></br>
+                    TMB Hombres = 10 × Peso(kg) + 6.25 × Altura(cm) - 5 ×
+                    Edad(años) + 5
+                  </>
+                ) : (
+                  <>
+                    Fórmula de Mifflin-ST Jeor
+                    <br></br>
+                    TMB Mujeres = 10 × Peso(kg) + 6.25 × Altura(cm) - 5 ×
+                    Edad(años) - 161
+                  </>
+                )}
+                {tmbResult.formula &&
+                  tmbResult.formula.includes("obesidad") && (
+                    <>
+                      <br />
+                      Peso ajustado = Peso ideal + 0.25 × (Peso real - Peso
+                      ideal)
+                      <br />
+                      Peso ideal = IMC objetivo × (Altura(m))²
+                    </>
+                  )}
+              </div>
             </div>
-          </div>
-        </h3>
-        <p className="font-bold text-indigo-600" style={numberStyle}>
-          {tmbResult.value} kcal
-        </p>
+          </h3>
+        </div>
+        <div className="pt-1">
+          <p className="font-bold text-indigo-600" style={numberStyle}>
+            {tmbResult.value} kcal
+          </p>
+        </div>
       </div>
     ),
 
@@ -704,6 +786,34 @@ export const Resultados = ({
     ),
   };
 
+  // return (
+  //   <div className="bg-white rounded-lg shadow p-3 md:p-4 h-full flex flex-col">
+  //     <div className="flex justify-between items-center mb-2">
+  //       <h2 className="font-semibold text-gray-700" style={titleStyle}>
+  //         Resultados
+  //       </h2>
+  //       <button
+  //         onClick={resetOrder}
+  //         className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded text-sm transition-colors"
+  //         style={textStyle}
+  //         title="Restablecer orden original"
+  //       >
+  //         ↺ Reiniciar orden
+  //       </button>
+  //     </div>
+
+  //     <div className="space-y-3 flex-grow">
+  //       {elementOrder.map((id) => componentMap[id]).filter(Boolean)}
+
+  //       {Object.values(componentMap).filter(Boolean).length === 0 && (
+  //         <div className="text-center py-8 text-gray-500" style={textStyle}>
+  //           Complete los datos del usuario para ver los resultados
+  //         </div>
+  //       )}
+  //     </div>
+  //   </div>
+  // );
+
   return (
     <div className="bg-white rounded-lg shadow p-3 md:p-4 h-full flex flex-col">
       <div className="flex justify-between items-center mb-2">
@@ -720,15 +830,45 @@ export const Resultados = ({
         </button>
       </div>
 
-      <div className="space-y-3 flex-grow">
-        {elementOrder.map((id) => componentMap[id]).filter(Boolean)}
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <Droppable droppableId="resultados">
+          {(provided) => (
+            <div
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+              className="space-y-3 flex-grow"
+            >
+              {elementOrder.map((id, index) => {
+                const component = componentMap[id];
+                if (!component) return null;
 
-        {Object.values(componentMap).filter(Boolean).length === 0 && (
-          <div className="text-center py-8 text-gray-500" style={textStyle}>
-            Complete los datos del usuario para ver los resultados
-          </div>
-        )}
-      </div>
+                return (
+                  <Draggable key={id} draggableId={id} index={index}>
+                    {(provided, snapshot) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        className={`${snapshot.isDragging ? "opacity-70" : ""}`}
+                      >
+                        <div {...provided.dragHandleProps}>{component}</div>
+                      </div>
+                    )}
+                  </Draggable>
+                );
+              })}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
+
+      {Object.values(componentMap).filter(Boolean).length === 0 && (
+        <div className="text-center py-8 text-gray-500" style={textStyle}>
+          Complete los datos del usuario para ver los resultados
+        </div>
+      )}
     </div>
   );
+
+
 };

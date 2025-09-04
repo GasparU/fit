@@ -12,6 +12,7 @@ import { ImcUser } from "./Elements/ImcUser";
 import { FrecuenciaCardiacaUser } from "./Elements/FrecuenciaCardiacaUser";
 import { ObjetivosPlanUser } from "./Elements/ObjetivosPlanUser";
 import { DistribucionMacronutrientes } from "./Elements/DistribucionMacronutrientes";
+import { useDynamicStyles } from './../hooks/useDynamicStyles';
 
 export const Home = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -20,7 +21,7 @@ export const Home = () => {
   const [filtroGlucemia, setFiltroGlucemia] = useState("");
   const [fontSize, setFontSize] = useState(14);
   const [userData, setUserData] = useState({
-     edad: "",
+  edad: "",
   sexo: "hombre",
   talla: "",
   peso: "",
@@ -48,12 +49,6 @@ export const Home = () => {
     energiaTotalResult
   );
 
-  const [columnOrder, setColumnOrder] = useState([
-    "resultados",
-    "busqueda",
-    "resumen",
-  ]);
-
   const handleUserDataChange = (field, value) => {
     setUserData((prev) => ({
       ...prev,
@@ -65,48 +60,34 @@ export const Home = () => {
     switch (userData.objetivoPlan) {
       case "deficit":
         return {
-          proteinas: { min: 1.6, max: 2.4, porcentaje: "20-30%" },
-          carbohidratos: { min: 3, max: 4, porcentaje: "40-50%" },
-          grasas: { min: 0.8, max: 1, porcentaje: "20-30%" },
+          proteinas: { min: 1.6, max: 2.5, porcentaje: "20-30%" },
+          carbohidratos: { min: 3, max: 5, porcentaje: "40-50%" },
+          grasas: { min: 0.2, max: 0.5, porcentaje: "20-30%" },
         };
       case "recomposicion":
         return {
-          proteinas: { min: 1.7, max: 2.4, porcentaje: "25-30%" },
-          carbohidratos: { min: 4, max: 5, porcentaje: "40-50%" },
-          grasas: { min: 0.5, max: 0.5, porcentaje: "15-25%" },
+          proteinas: { min: 1.8, max: 2.5, porcentaje: "25-30%" },
+          carbohidratos: { min: 2.5, max: 4.3, porcentaje: "40-50%" },
+          grasas: { min: 0.5, max: 0.8, porcentaje: "15-25%" },
         };
       case "aumento":
         return {
-          proteinas: { min: 1.6, max: 2.4, porcentaje: "20-30%" },
-          carbohidratos: { min: 5, max: 6, porcentaje: "45-55%" },
+          proteinas: { min: 1.5, max: 2.4, porcentaje: "20-30%" },
+          carbohidratos: { min: 4, max: 7, porcentaje: "45-55%" },
           grasas: { min: 0.5, max: 0.5, porcentaje: "20-30%" },
         };
       default:
         return {
-          proteinas: { min: 1.6, max: 2.4, porcentaje: "20-30%" },
-          carbohidratos: { min: 3, max: 4, porcentaje: "40-50%" },
-          grasas: { min: 0.8, max: 1, porcentaje: "20-30%" },
+          proteinas: { min: 1.6, max: 2.5, porcentaje: "20-30%" },
+          carbohidratos: { min: 3, max: 5, porcentaje: "40-50%" },
+          grasas: { min: 0.2, max: 0.5, porcentaje: "20-30%" },
         };
     }
   };
 
   // Estilos dinámicos para todas las columnas
-  const textStyle = {
-    fontSize: `${fontSize}px`,
-  };
-
-  const titleStyle = {
-    fontSize: `${fontSize + 2}px`,
-  };
-
-  const numberStyle = {
-    fontSize: `${fontSize + 4}px`,
-  };
-
-  const smallTextStyle = {
-    fontSize: `${fontSize - 2}px`,
-  };
-
+  const { textStyle, titleStyle, numberStyle, smallTextStyle } =
+    useDynamicStyles(fontSize);
   
   // Títulos de las columnas
   const columnTitles = {
@@ -122,9 +103,9 @@ export const Home = () => {
         <h1 className="text-xl md:text-2xl font-bold text-white">
           Herramienta Nutricional para Gimnasio
         </h1>
-        <p className="text-white text-sm md:text-base mt-1">
+        {/* <p className="text-white text-sm md:text-base mt-1">
           Herramienta para profesionales de la salud y fitness
-        </p>
+        </p> */}
       </header>
 
       <Buttons
@@ -229,7 +210,7 @@ export const Home = () => {
             objetivoResult={objetivoResult}
             numberStyle={numberStyle}
           />
-        </div>
+        </div>       
       </div>
     </div>
   );

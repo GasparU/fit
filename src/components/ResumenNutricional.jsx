@@ -1,6 +1,8 @@
-// ResumenNutricional.jsx (actualizado)
+// ResumenNutricional.jsx (corregido)
 
 import { ResumenKcalPeso } from "./resumen/ResumenKcalPeso";
+import {useMacroCalculations} from '../hooks/useMacroCalculations';
+import { useMemo } from "react";
 
 const totalNutrients = (selectedFoods) => {
   // Inicializar todos los nutrientes en 0
@@ -31,60 +33,6 @@ const totalNutrients = (selectedFoods) => {
   return result;
 };
 
-// Función para obtener el color según el nivel de saciedad
-const getSaciedadColor = (saciedad) => {
-  if (!saciedad) return "gray";
-
-  const saciedadLower = saciedad.toLowerCase();
-  if (
-    saciedadLower.includes("alta") ||
-    saciedadLower.includes("alto") ||
-    saciedadLower.includes("high")
-  ) {
-    return "green";
-  } else if (
-    saciedadLower.includes("media") ||
-    saciedadLower.includes("medio") ||
-    saciedadLower.includes("medium")
-  ) {
-    return "yellow";
-  } else if (
-    saciedadLower.includes("baja") ||
-    saciedadLower.includes("bajo") ||
-    saciedadLower.includes("low")
-  ) {
-    return "red";
-  }
-  return "gray";
-};
-
-// Función para obtener el color según el nivel de glucemia
-const getGlucemiaColor = (glucemia) => {
-  if (!glucemia) return "gray";
-
-  const glucemiaLower = glucemia.toLowerCase();
-  if (
-    glucemiaLower.includes("alta") ||
-    glucemiaLower.includes("alto") ||
-    glucemiaLower.includes("high")
-  ) {
-    return "red";
-  } else if (
-    glucemiaLower.includes("media") ||
-    glucemiaLower.includes("medio") ||
-    glucemiaLower.includes("medium")
-  ) {
-    return "orange";
-  } else if (
-    glucemiaLower.includes("baja") ||
-    glucemiaLower.includes("bajo") ||
-    glucemiaLower.includes("low")
-  ) {
-    return "green";
-  }
-  return "gray";
-};
-
 export const ResumenNutricional = ({
   selectedFoods,
   userData,
@@ -96,6 +44,25 @@ export const ResumenNutricional = ({
 }) => {
   // Calcular los nutrientes totales
   const totalNutrientsResult = totalNutrients(selectedFoods);
+
+  // Calcular macronutrientes objetivo
+  const caloriasObjetivo = useMemo(() => {
+    if (userData.objetivoPlan === "recomposicion") {
+      return energiaTotalResult?.value || 0;
+    } else {
+      return objetivoResult?.final || 0;
+    }
+  }, [userData.objetivoPlan, energiaTotalResult, objetivoResult]);
+
+  const macroNutrientes = useMacroCalculations(userData, caloriasObjetivo);
+
+  // Calcular déficit real
+  const deficitReal = useMemo(() => {
+    if (macroNutrientes && totalNutrientsResult.energia > 0) {
+      return totalNutrientsResult.energia - macroNutrientes.totalCalorias;
+    }
+    return 0;
+  }, [totalNutrientsResult.energia, macroNutrientes]);
 
   // Estilos dinámicos
   const textStyle = {
@@ -119,160 +86,92 @@ export const ResumenNutricional = ({
       ) : (
         <>
           <div className="grid grid-cols-2 gap-3 mb-4">
+            {/* Energía Total Consumida */}
             <div className="bg-blue-50 p-3 rounded-md transition-all duration-300 hover:bg-blue-100">
               <h3 className="font-medium text-blue-800" style={textStyle}>
-                Energía Total
+                Energía Total de los Alimentos
               </h3>
               <p className="font-bold text-blue-600" style={numberStyle}>
                 {totalNutrientsResult.energia.toFixed(1)}kcal
               </p>
             </div>
 
-            <div className="bg-green-50 p-3 rounded-md transition-all duration-300 hover:bg-green-100">
-              <h3 className="font-medium text-green-800" style={textStyle}>
-                Proteínas Total
-              </h3>
-              <p className="font-bold text-green-600" style={numberStyle}>
-                {totalNutrientsResult.proteinas.toFixed(1)}g
-              </p>
-            </div>
-
+            {/* Total de Macronutrientes Objetivo */}
             <div className="bg-purple-50 p-3 rounded-md transition-all duration-300 hover:bg-purple-100">
               <h3 className="font-medium text-purple-800" style={textStyle}>
-                Grasas Total
+                Total Macronutrientes Objetivo
               </h3>
               <p className="font-bold text-purple-600" style={numberStyle}>
-                {totalNutrientsResult.grasa.toFixed(1)}g
+                {macroNutrientes ? macroNutrientes.totalCalorias.toFixed(0) : 0}
+                kcal
               </p>
             </div>
+          </div>
 
-            <div className="bg-yellow-50 p-3 rounded-md transition-all duration-300 hover:bg-yellow-100">
-              <h3 className="font-medium text-yellow-800" style={textStyle}>
-                Carbohidratos Disp.
+          {/* Diferencia (Déficit Real) */}
+          <div className="mb-4">
+            <div
+              className={`p-3 rounded-md transition-all duration-300 ${
+                deficitReal > 0
+                  ? "bg-red-50 hover:bg-red-100"
+                  : deficitReal < 0
+                  ? "bg-green-50 hover:bg-green-100"
+                  : "bg-gray-50 hover:bg-gray-100"
+              }`}
+            >
+              <h3 className="font-medium" style={textStyle}>
+                {deficitReal > 0
+                  ? "Excedente Real"
+                  : deficitReal < 0
+                  ? "Déficit Real"
+                  : "Balance Perfecto"}
               </h3>
-              <p className="font-bold text-yellow-600" style={numberStyle}>
-                {totalNutrientsResult.carbohidratos_disp.toFixed(1)}g
+              <p
+                className={`font-bold ${
+                  deficitReal > 0
+                    ? "text-red-600"
+                    : deficitReal < 0
+                    ? "text-green-600"
+                    : "text-gray-600"
+                }`}
+                style={numberStyle}
+              >
+                {Math.abs(deficitReal).toFixed(0)}kcal
+                {deficitReal > 0
+                  ? " por encima del objetivo"
+                  : deficitReal < 0
+                  ? " por debajo del objetivo"
+                  : ""}
+              </p>
+              <p className="text-gray-600 text-sm mt-1" style={textStyle}>
+                {deficitReal > 0
+                  ? "⚠️ Estás consumiendo más calorías de las planeadas"
+                  : deficitReal < 0
+                  ? "✅ Estás en déficit calórico respecto a tu objetivo"
+                  : "🎯 Perfectamente alineado con tu objetivo"}
               </p>
             </div>
           </div>
 
-          {/* Información adicional */}
-          <div className="space-y-3">
-            {totalNutrientsResult.fibra > 0 && (
-              <div className="bg-indigo-50 p-3 rounded-md transition-all duration-300 hover:bg-indigo-100">
-                <h3 className="font-medium text-indigo-800" style={textStyle}>
-                  Fibra Dietética
-                </h3>
-                <p className="font-bold text-indigo-600" style={numberStyle}>
-                  {totalNutrientsResult.fibra.toFixed(1)}g
-                </p>
-              </div>
-            )}
-
-            {totalNutrientsResult.agua > 0 && (
-              <div className="bg-cyan-50 p-3 rounded-md transition-all duration-300 hover:bg-cyan-100">
-                <h3 className="font-medium text-cyan-800" style={textStyle}>
-                  Agua Total
-                </h3>
-                <p className="font-bold text-cyan-600" style={numberStyle}>
-                  {totalNutrientsResult.agua.toFixed(1)}ml
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* Resumen de alimentos - VERSIÓN MEJORADA Y COLORIDA */}
+          {/* Resumen de alimentos - VERSIÓN SIMPLIFICADA */}
           <div className="mt-4">
             <h3 className="font-medium mb-2 text-gray-700" style={textStyle}>
               Alimentos en la selección ({selectedFoods.length})
             </h3>
-            <div className="space-y-2">
-              {selectedFoods.map((food, index) => {
-                const factor = food.cantidad / 100;
-                const saciedadColor = getSaciedadColor(food.saciedad);
-                const glucemiaColor = getGlucemiaColor(food.glucemia);
-
-                return (
-                  <div
-                    key={index}
-                    className="bg-gray-50 p-3 rounded-md border border-gray-200"
-                  >
-                    <div className="flex justify-between items-start mb-2">
-                      <span
-                        className="font-medium text-gray-800"
-                        style={textStyle}
-                      >
-                        {food.nombre_alimento}
-                      </span>
-                      <span
-                        className="text-gray-600 font-medium"
-                        style={textStyle}
-                      >
-                        {food.cantidad}g
-                      </span>
-                    </div>
-
-                    <div
-                      className="grid grid-cols-2 gap-2 mb-2"
-                      style={{ fontSize: `${fontSize - 1}px` }}
-                    >
-                      <div className="text-blue-600">
-                        <span className="font-medium">Energía: </span>
-                        {(food.energia * factor).toFixed(1)}kcal
-                      </div>
-                      <div className="text-green-600">
-                        <span className="font-medium">Proteínas: </span>
-                        {(food.proteinas * factor).toFixed(1)}g
-                      </div>
-                      <div className="text-purple-600">
-                        <span className="font-medium">Grasas: </span>
-                        {(food.grasa * factor).toFixed(1)}g
-                      </div>
-                      <div className="text-yellow-600">
-                        <span className="font-medium">Carbohidratos: </span>
-                        {(
-                          (food.carbohidratos_disp || food.carbohidratos_tot) *
-                          factor
-                        ).toFixed(1)}
-                        g
-                      </div>
-                    </div>
-
-                    <div className="flex gap-2">
-                      {food.saciedad && (
-                        <span
-                          className={`px-2 py-1 rounded text-xs ${
-                            saciedadColor === "green"
-                              ? "bg-green-100 text-green-800 border border-green-200"
-                              : saciedadColor === "yellow"
-                              ? "bg-yellow-100 text-yellow-800 border border-yellow-200"
-                              : saciedadColor === "red"
-                              ? "bg-red-100 text-red-800 border border-red-200"
-                              : "bg-gray-100 text-gray-800 border border-gray-200"
-                          }`}
-                        >
-                          Saciedad: {food.saciedad}
-                        </span>
-                      )}
-                      {food.glucemia && (
-                        <span
-                          className={`px-2 py-1 rounded text-xs ${
-                            glucemiaColor === "green"
-                              ? "bg-green-100 text-green-800 border border-green-200"
-                              : glucemiaColor === "orange"
-                              ? "bg-orange-100 text-orange-800 border border-orange-200"
-                              : glucemiaColor === "red"
-                              ? "bg-red-100 text-red-800 border border-red-200"
-                              : "bg-gray-100 text-gray-800 border border-gray-200"
-                          }`}
-                        >
-                          Glucemia: {food.glucemia}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
+            <div className="space-y-1">
+              {selectedFoods.map((food, index) => (
+                <div
+                  key={index}
+                  className="flex justify-between items-center bg-gray-50 p-2 rounded-md border border-gray-200"
+                >
+                  <span className="font-medium text-gray-800" style={textStyle}>
+                    {food.nombre_alimento}
+                  </span>
+                  <span className="text-gray-600 font-medium" style={textStyle}>
+                    {food.cantidad}g
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         </>
@@ -283,8 +182,8 @@ export const ResumenNutricional = ({
         grasaCorporalResult={grasaCorporalResult}
         fontSize={fontSize}
         userData={userData}
-        energiaTotalResult={energiaTotalResult} // Nueva prop
-        objetivoResult={objetivoResult} // Nueva prop
+        energiaTotalResult={energiaTotalResult}
+        objetivoResult={objetivoResult}
       />
     </div>
   );
