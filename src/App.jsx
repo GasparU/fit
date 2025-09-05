@@ -1,13 +1,28 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import "./App.css";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Home } from "./routes/Home";
 import Login from "./routes/Login";
+import UpdatePassword from "./routes/UpdatePassword";
 import { useAuth } from "./hooks/useAuth";
+import { useEffect, useState } from "react";
 
 function App() {
   const { user, loading } = useAuth();
+  const location = useLocation();
+  const [isRecoveryFlow, setIsRecoveryFlow] = useState(false);
+
+  // Detectar si estamos en un flujo de recuperación
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (
+      hash.includes("type=recovery") &&
+      location.pathname === "/update-password"
+    ) {
+      setIsRecoveryFlow(true);
+    }
+  }, [location]);
 
   if (loading) {
     return (
@@ -22,11 +37,32 @@ function App() {
       <Routes>
         <Route
           path="/"
-          element={user ? <Home /> : <Navigate to="/login" replace />}
+          element={
+            user && !isRecoveryFlow ? (
+              <Home />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
         />
         <Route
           path="/login"
-          element={!user ? <Login /> : <Navigate to="/" replace />}
+          element={
+            !user || isRecoveryFlow ? <Login /> : <Navigate to="/" replace />
+          }
+        />
+        {/* Permite acceso a update-password incluso con usuario autenticado durante recuperación */}
+        <Route
+          path="/update-password"
+          element={
+            isRecoveryFlow ? (
+              <UpdatePassword />
+            ) : user ? (
+              <Navigate to="/" replace />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
         />
       </Routes>
     </DndProvider>

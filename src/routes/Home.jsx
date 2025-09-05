@@ -29,21 +29,7 @@ export const Home = () => {
   const [filtroSaciedad, setFiltroSaciedad] = useState("");
   const [filtroGlucemia, setFiltroGlucemia] = useState("");
   const [fontSize, setFontSize] = useState(14);
-  // const [userData, setUserData] = useState({
-  //   edad: "",
-  //   sexo: "hombre",
-  //   talla: "",
-  //   peso: "",
-  //   imcObjetivo: 22,
-  //   diasActividad: 0,
-  //   porcentajeCardio: 75,
-  //   nivelCardio: "Moderado",
-  //   objetivoPlan: "recomposicion",
-  //   porcentajeObjetivo: 10,
-  //   proteinas: "",
-  //   carbohidratos: "",
-  //   grasas: "",
-  // });
+
 
   // Usar el hook de perfil de usuario
   const { userData, loading, saveUserProfile, saveAllUserData } =
