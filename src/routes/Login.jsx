@@ -37,19 +37,29 @@ const Login = () => {
 
   // Autenticación con Google
   const handleGoogleLogin = async () => {
-    console.log("Redirect URL:", `${window.location.origin}/`);
     try {
       setLoading(true);
+
+      // Determinar la URL de redirección automáticamente
+      const isLocalhost =
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1";
+      const redirectTo = isLocalhost
+        ? "http://localhost:5173/"
+        : "https://sensational-lebkuchen-9c7fc4.netlify.app/";
+
+      console.log("Redirect URL:", redirectTo);
+
       const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
+        provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/`
-        }
+          redirectTo: redirectTo,
+        },
       });
 
       if (error) throw error;
     } catch (error) {
-      showMessage(error.message, 'error');
+      showMessage(error.message, "error");
     } finally {
       setLoading(false);
     }
