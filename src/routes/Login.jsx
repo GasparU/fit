@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { FaEye, FaEyeSlash, FaUser, FaEnvelope, FaLock, FaPhone, FaDumbbell, FaGoogle } from 'react-icons/fa';
+import { FaEye, FaEyeSlash, FaUser, FaEnvelope, FaLock, FaPhone, FaDumbbell } from 'react-icons/fa';
 
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabase/supabaseClient';
