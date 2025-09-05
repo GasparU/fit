@@ -20,10 +20,13 @@ function App() {
   return (
     <DndProvider backend={HTML5Backend}>
       <Routes>
-        <Route path="/" element={user ? <Home /> : <Navigate to="/login" />} />
+        <Route
+          path="/"
+          element={user ? <Home /> : <Navigate to="/login" replace />}
+        />
         <Route
           path="/login"
-          element={!user ? <Login /> : <Navigate to="/" />}
+          element={!user ? <Login /> : <Navigate to="/" replace />}
         />
       </Routes>
     </DndProvider>
