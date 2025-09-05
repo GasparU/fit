@@ -1,5 +1,5 @@
 // Home.jsx
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Resultados } from "../components/Resultados";
 import { BusquedaComida } from "../components/BusquedaComida";
 import { ResumenNutricional } from "../components/ResumenNutricional";
@@ -13,29 +13,45 @@ import { FrecuenciaCardiacaUser } from "./Elements/FrecuenciaCardiacaUser";
 import { ObjetivosPlanUser } from "./Elements/ObjetivosPlanUser";
 import { DistribucionMacronutrientes } from "./Elements/DistribucionMacronutrientes";
 import { useDynamicStyles } from './../hooks/useDynamicStyles';
-import logo2 from "/NutriGymAMG.png"
+import { supabase } from "../supabase/supabaseClient";
+import Header from "../components/Header";
+import { useAuth } from "../hooks/useAuth";
+import { useUserProfile } from "../hooks/useUserProfile";
+
+
+
+
 
 export const Home = () => {
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFoods, setSelectedFoods] = useState([]);
   const [filtroSaciedad, setFiltroSaciedad] = useState("");
   const [filtroGlucemia, setFiltroGlucemia] = useState("");
   const [fontSize, setFontSize] = useState(14);
-  const [userData, setUserData] = useState({
-    edad: "",
-    sexo: "hombre",
-    talla: "",
-    peso: "",
-    imcObjetivo: 22,
-    diasActividad: 0,
-    porcentajeCardio: 75,
-    nivelCardio: "Moderado",
-    objetivoPlan: "recomposicion",
-    porcentajeObjetivo: 10,
-    proteinas: "",
-    carbohidratos: "",
-    grasas: "",
-  });
+  // const [userData, setUserData] = useState({
+  //   edad: "",
+  //   sexo: "hombre",
+  //   talla: "",
+  //   peso: "",
+  //   imcObjetivo: 22,
+  //   diasActividad: 0,
+  //   porcentajeCardio: 75,
+  //   nivelCardio: "Moderado",
+  //   objetivoPlan: "recomposicion",
+  //   porcentajeObjetivo: 10,
+  //   proteinas: "",
+  //   carbohidratos: "",
+  //   grasas: "",
+  // });
+
+  // Usar el hook de perfil de usuario
+  const { userData, loading, saveUserProfile, saveAllUserData } =
+    useUserProfile(user);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+  };
 
   const {
     imcResult,
@@ -51,12 +67,39 @@ export const Home = () => {
     energiaTotalResult
   );
 
-  const handleUserDataChange = (field, value) => {
-    setUserData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+  const handleUserDataChange = async (field, value) => {
+    const newUserData = { ...userData, [field]: value };
+    await saveUserProfile(field, value);
+    // setUserData((prev) => ({
+    //   ...prev,
+    //   [field]: value,
+    // }));
   };
+
+  // Guardar todos los datos periódicamente o cuando sea necesario
+  useEffect(() => {
+    const saveData = async () => {
+      if (user) {
+        await saveAllUserData(userData);
+      }
+    };
+
+    // Guardar cada 30 segundos cuando hay cambios
+    const timer = setTimeout(saveData, 30000);
+    return () => clearTimeout(timer);
+  }, [userData, user, saveAllUserData]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-cyan-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Cargando tu perfil...</p>
+        </div>
+      </div>
+    );
+  }
+
   // Función para calcular los rangos de macronutrientes según el objetivo
   const getMacroRanges = () => {
     switch (userData.objetivoPlan) {
@@ -90,7 +133,7 @@ export const Home = () => {
   // Estilos dinámicos para todas las columnas
   const { textStyle, titleStyle, numberStyle, smallTextStyle } =
     useDynamicStyles(fontSize);
-  
+
   // Títulos de las columnas
   const columnTitles = {
     resultados: "Resultados",
@@ -101,23 +144,7 @@ export const Home = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-cyan-50 p-2 md:p-4">
       {/* Encabezado con colores llamativos */}
-      <header className="text-center mb-4 py-3 bg-gradient-to-r from-green-500 to-teal-500 rounded-lg shadow-md">
-        <div className="flex items-center justify-center">
-          {/* Logo - Visible en todos los dispositivos */}
-          <img
-            src={logo2}
-            alt="Logo Nutricional"
-            className="h-20 w-20 md:h-16 md:w-16 lg:h-20 lg:w-20 xl:h-24 xl:w-24 object-contain"
-          />
-          {/* Texto - Oculto en móviles, visible en tablets y superiores */}
-          <div className="hidden md:block ml-3">
-            <h1 className="text-xl md:text-2xl font-bold text-white">
-              Herramienta Nutricional para Gimnasio
-            </h1>
-          </div>
-        </div>
-      </header>
-
+      <Header user={user} />
       <Buttons
         fontSize={fontSize}
         handleUserDataChange={handleUserDataChange}

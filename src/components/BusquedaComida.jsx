@@ -2,7 +2,7 @@
 // BusquedaComida.jsx
 import { useMemo } from "react";
 import { DragDropContext, Droppable } from "@hello-pangea/dnd";
-import { alimentosList } from "../firebase/lista";
+import { alimentosList } from "../supabase/lista";
 import { applyFoodFilters } from "../utils/foodFilters";
 import { DraggableFoodItem } from "./DraggableFoodItem";
 import { FoodSuggestions } from "./FoodSuggestions";

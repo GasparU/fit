@@ -1,7 +1,8 @@
-import React from "react";
+
 
 export const DatosUser = ({ userData, fontSize, handleUserDataChange }) => {
-  const textStyle = {
+
+   const textStyle = {
     fontSize: `${fontSize}px`,
   };
 
@@ -17,6 +18,11 @@ export const DatosUser = ({ userData, fontSize, handleUserDataChange }) => {
     fontSize: `${fontSize - 2}px`,
   };
 
+  const handleChange = async (field, value) => {
+    // Llamar a la función que guarda en Supabase
+    await handleUserDataChange(field, value);
+  };
+
   return (
     <div className="space-y-2 flex-grow overflow-y-auto">
       <div>
@@ -26,7 +32,7 @@ export const DatosUser = ({ userData, fontSize, handleUserDataChange }) => {
         <input
           type="number"
           value={userData.edad}
-          onChange={(e) => handleUserDataChange("edad", e.target.value)}
+          onChange={(e) => handleChange("edad", e.target.value)}
           className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-300 focus:border-green-400 transition-all"
           placeholder="Años"
           style={textStyle}

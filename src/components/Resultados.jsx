@@ -175,20 +175,6 @@ export const Resultados = ({
   const [draggingId, setDraggingId] = useState(null);
   const [dragOverId, setDragOverId] = useState(null);
 
-  // Handlers para drag and drop
-  // const handleDragStart = (e, id) => {
-  //   setDraggingId(id);
-  //   e.dataTransfer.effectAllowed = "move";
-  //   e.dataTransfer.setData("text/plain", id);
-  // };
-
-  // const handleDragOver = (e, id) => {
-  //   e.preventDefault();
-  //   if (id !== dragOverId) {
-  //     setDragOverId(id);
-  //   }
-  // };
-
   // Función para manejar el fin del arrastre
   const handleDragEnd = (result) => {
     if (!result.destination) return;

@@ -3,6 +3,7 @@
 import { ResumenKcalPeso } from "./resumen/ResumenKcalPeso";
 import {useMacroCalculations} from '../hooks/useMacroCalculations';
 import { useMemo } from "react";
+import { DistribucionComidas } from "./resumen/DistribucionComidas";
 
 const totalNutrients = (selectedFoods) => {
   // Inicializar todos los nutrientes en 0
@@ -63,6 +64,16 @@ export const ResumenNutricional = ({
     }
     return 0;
   }, [totalNutrientsResult.energia, macroNutrientes]);
+
+  // Verificar si hay datos de macronutrientes
+  const tieneDatosMacros = useMemo(() => {
+    return (
+      macroNutrientes &&
+      macroNutrientes.proteinas !== undefined &&
+      macroNutrientes.carbohidratos !== undefined &&
+      macroNutrientes.grasas !== undefined
+    );
+  }, [macroNutrientes]);
 
   // Estilos dinámicos
   const textStyle = {
@@ -185,6 +196,13 @@ export const ResumenNutricional = ({
         energiaTotalResult={energiaTotalResult}
         objetivoResult={objetivoResult}
       />
+      {/* Mostrar DistribucionComidas solo si hay datos de macronutrientes */}
+      {tieneDatosMacros && (
+        <DistribucionComidas
+          caloriasObjetivo={caloriasObjetivo}
+          fontSize={fontSize}
+        />
+      )}
     </div>
   );
 };
