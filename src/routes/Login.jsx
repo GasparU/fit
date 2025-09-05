@@ -37,6 +37,7 @@ const Login = () => {
 
   // Autenticación con Google
   const handleGoogleLogin = async () => {
+    console.log("Redirect URL:", `${window.location.origin}/`);
     try {
       setLoading(true);
       const { error } = await supabase.auth.signInWithOAuth({

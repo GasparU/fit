@@ -8,10 +8,7 @@ import { useAuth } from './hooks/useAuth';
 
 
 function App() {
-  console.log("Variables de entorno:", {
-    url: import.meta.env.VITE_SUPABASE_URL,
-    key: import.meta.env.VITE_SUPABASE_ANON_KEY ? "PRESENTE" : "FALTANTE",
-  });
+  
   const { user, loading } = useAuth();
 
   if (loading) {
