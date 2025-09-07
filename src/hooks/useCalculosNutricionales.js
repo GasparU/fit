@@ -54,7 +54,7 @@ export const useCalculosNutricionales = (userData) => {
       let formulaUsada = "";
       let pesoIdeal = 0;
 
-      if (imcValor < 25) {
+      if (imcValor < 30) {
         if (userData.sexo === "hombre") {
           tmb = 10 * peso + 6.25 * talla - 5 * edad + 5;
           formulaUsada = "Mifflin-St Jeor (Hombres)";
@@ -69,7 +69,7 @@ export const useCalculosNutricionales = (userData) => {
         const pesoAjustado = pesoIdeal + 0.25 * (peso - pesoIdeal);
 
         if (userData.sexo === "hombre") {
-          tmb = 370 + 21.6 * (peso - peso * 0.28);
+          tmb = 370 + 21.6 * (pesoIdeal);
           formulaUsada =
             "Ajustada para obesidad (Hombres) Fórmula de Katch–McArdle ";
         } else {
@@ -85,7 +85,14 @@ export const useCalculosNutricionales = (userData) => {
       };
     }
     return null;
-  }, [userData, imcResult]);
+  }, [
+    userData.edad,
+    userData.peso,
+    userData.talla,
+    userData.sexo,
+    userData.imcObjetivo,
+    imcResult,
+  ]);
 
   // Calcular TDEE (MODIFICADO - ahora usa tmbResult.total)
   const tdeeResult = useMemo(() => {

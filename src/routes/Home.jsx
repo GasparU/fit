@@ -13,31 +13,48 @@ import { FrecuenciaCardiacaUser } from "./Elements/FrecuenciaCardiacaUser";
 import { ObjetivosPlanUser } from "./Elements/ObjetivosPlanUser";
 import { DistribucionMacronutrientes } from "./Elements/DistribucionMacronutrientes";
 import { useDynamicStyles } from './../hooks/useDynamicStyles';
-import { supabase } from "../supabase/supabaseClient";
 import Header from "../components/Header";
 import { useAuth } from "../hooks/useAuth";
 import { useUserProfile } from "../hooks/useUserProfile";
 
-
-
-
-
 export const Home = () => {
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedFoods, setSelectedFoods] = useState([]);
   const [filtroSaciedad, setFiltroSaciedad] = useState("");
   const [filtroGlucemia, setFiltroGlucemia] = useState("");
   const [fontSize, setFontSize] = useState(14);
 
-
   // Usar el hook de perfil de usuario
-  const { userData, loading, saveUserProfile, saveAllUserData } =
-    useUserProfile(user);
+  const {
+    userData,
+    selectedFoods,
+    setSelectedFoods,
+    loading,
+    saveUserProfile,
+    saveAllUserData,
+    saveSelectedFood,
+    removeSelectedFood,
+    updateFoodQuantity,
+    loadSelectedFoods,
+  } = useUserProfile(user);
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-  };
+  // Reemplazar las funciones locales
+ const handleFoodSelect = async (food) => {
+   const foodWithDefaults = {
+     ...food,
+     id: food.CODIGO || food.id || food.nombre_alimento || `food_${Date.now()}`,
+     name: food.nombre_alimento || food.name || "Alimento sin nombre",
+     cantidad: 100,
+     proteinas: food.proteinas || 0,
+     carbohidratos: food.carbohidratos_tot || food.carbohidratos || 0,
+     grasas: food.grasa || food.grasas || 0,
+     calorias: food.energia || food.calorias || 0,
+   };
+
+   await saveSelectedFood(foodWithDefaults);
+   await loadSelectedFoods();
+   setSearchTerm("");
+ };
 
   const {
     imcResult,
@@ -53,13 +70,61 @@ export const Home = () => {
     energiaTotalResult
   );
 
+  // Agregar este useEffect para cargar las comidas al iniciar
+  useEffect(() => {
+    if (user && !loading) {
+      loadSelectedFoods();
+    }
+  }, [user, loading, loadSelectedFoods]);
+
+  const handleCantidadChange = async (index, cantidad) => {
+    const newFoods = selectedFoods.map((food, i) =>
+      i === index ? { ...food, cantidad: Math.max(1, cantidad) } : food
+    );
+    setSelectedFoods(newFoods);
+
+    // Guardar en Supabase
+    const food = selectedFoods[index];
+    const foodUUID =
+      food.food_id || food.CODIGO || food.id || food.nombre_alimento;
+    await updateFoodQuantity(food.id, cantidad);
+  };
+
+  // En handleRemoveFood
+  // const handleRemoveFood = async (index) => {
+  //   const foodToRemove = selectedFoods[index];
+  //   const newFoods = selectedFoods.filter((_, i) => i !== index);
+  //   setSelectedFoods(newFoods);
+
+  //   // Eliminar de Supabase
+  //   const foodId =
+  //     foodToRemove.food_id ||
+  //     foodToRemove.CODIGO ||
+  //     foodToRemove.id ||
+  //     foodToRemove.nombre_alimento;
+  //   await removeSelectedFood(foodId);
+  // };
+  const handleRemoveFood = async (index) => {
+    const foodToRemove = selectedFoods[index];
+
+    // Usar el ID único de la base de datos (debería ser 'id' en user_selected_foods)
+    const foodUUID = foodToRemove.id; 
+    if (!foodUUID) {
+      console.error("No se pudo encontrar el ID del alimento para eliminar");
+      return;
+    }
+
+    // Eliminar de Supabase primero
+    await removeSelectedFood(foodUUID);
+
+    // Luego actualizar el estado local
+    const newFoods = selectedFoods.filter((_, i) => i !== index);
+    setSelectedFoods(newFoods);
+  };
+
   const handleUserDataChange = async (field, value) => {
     const newUserData = { ...userData, [field]: value };
     await saveUserProfile(field, value);
-    // setUserData((prev) => ({
-    //   ...prev,
-    //   [field]: value,
-    // }));
   };
 
   // Guardar todos los datos periódicamente o cuando sea necesario
@@ -219,6 +284,9 @@ export const Home = () => {
             filtroGlucemia={filtroGlucemia}
             setFiltroGlucemia={setFiltroGlucemia}
             fontSize={fontSize}
+            onRemoveFood={handleRemoveFood}
+            onUpdateQuantity={handleCantidadChange}
+            onFoodSelect={handleFoodSelect}
           />
         </div>
 

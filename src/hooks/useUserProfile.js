@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import { supabase } from "../supabase/supabaseClient";
 
 export const useUserProfile = (user) => {
+  const [loading, setLoading] = useState(true);
+  const [selectedFoods, setSelectedFoods] = useState([]);
   const [userData, setUserData] = useState({
     edad: "",
     sexo: "hombre",
@@ -19,7 +21,124 @@ export const useUserProfile = (user) => {
     grasas: "",
   });
 
-  const [loading, setLoading] = useState(true);
+  // Cargar comidas seleccionadas
+  const loadSelectedFoods = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from("user_selected_foods")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: true });
+
+      if (error) {
+        console.error("Error loading selected foods:", error);
+        return;
+      }
+
+      if (data) {
+        // Mapear correctamente los campos de la base de datos
+        const mappedFoods = data.map((item) => ({
+          ...item,
+          id: item.id, // Asegurar que el ID único de la base de datos se incluya
+          nombre_alimento: item.food_name,
+          energia: item.calorias,
+          proteinas: item.proteinas,
+          grasa: item.grasas,
+          carbohidratos_tot: item.carbohidratos,
+          saciedad: item.saciedad,
+          glucemia: item.glucemia,
+          cantidad: item.cantidad || 100,
+        }));
+        setSelectedFoods(mappedFoods);
+      }
+    } catch (error) {
+      console.error("Error loading selected foods:", error);
+    }
+  };
+
+  // Guardar comida seleccionada
+  const saveSelectedFood = async (food) => {
+    if (!user) return;
+
+    try {
+      const foodUUID =
+        food.CODIGO || food.id || food.nombre_alimento || Date.now().toString();
+      const foodName =
+        food.nombre_alimento || food.name || "Alimento sin nombre";
+
+      // Asegurar que todos los campos tengan valores
+      const { error } = await supabase.from("user_selected_foods").upsert({
+        user_id: user.id,
+        food_id: foodUUID,
+        food_name: foodName,
+        cantidad: food.cantidad || 100,
+        proteinas: food.proteinas || 0,
+        carbohidratos: food.carbohidratos_tot || food.carbohidratos || 0,
+        grasas: food.grasa || food.grasas || 0,
+        calorias: food.energia || food.calorias || 0, // ← Aquí está el problema
+        saciedad: food.saciedad || "",
+        glucemia: food.glucemia || "",
+        updated_at: new Date().toISOString(),
+      });
+
+      if (error) {
+        console.error("Error saving selected food:", error);
+        return;
+      }
+
+      // Recargar los alimentos después de guardar
+      await loadSelectedFoods();
+    } catch (error) {
+      console.error("Error saving selected food:", error);
+    }
+  };
+
+  // Eliminar comida seleccionada
+const removeSelectedFood = async (foodUUID) => {
+  if (!user) return;
+
+  try {
+    const { error } = await supabase
+      .from("user_selected_foods")
+      .delete()
+      .eq("id", foodUUID)
+      .eq("user_id", user.id);
+    // .eq("id", foodId);
+
+    if (error) {
+      console.error("Error removing selected food:", error);
+    } else {
+      // Recargar los alimentos después de eliminar
+      await loadSelectedFoods();
+    }
+  } catch (error) {
+    console.error("Error removing selected food:", error);
+  }
+};
+
+  // Actualizar cantidad de comida
+  const updateFoodQuantity = async (foodUUID, cantidad) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from("user_selected_foods")
+        .update({
+          cantidad: cantidad,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("user_id", user.id)
+        .eq("food_id", foodUUID); // Asegúrate de que sea food_id
+
+      if (error) {
+        console.error("Error updating food quantity:", error);
+      }
+    } catch (error) {
+      console.error("Error updating food quantity:", error);
+    }
+  };
 
   // Cargar perfil del usuario
   useEffect(() => {
@@ -196,9 +315,15 @@ export const useUserProfile = (user) => {
 
   return {
     userData,
+    selectedFoods,
+    setSelectedFoods,
     loading,
     saveUserProfile,
     saveAllUserData,
     loadUserProfile,
+    saveSelectedFood,
+    removeSelectedFood,
+    updateFoodQuantity,
+    loadSelectedFoods,
   };
 };

@@ -258,7 +258,7 @@ export const DistribucionComidas = ({ caloriasObjetivo, fontSize = 14 }) => {
           <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-4 rounded-xl border border-blue-100 shadow-sm">
               <div className="flex items-start">
-                <span className="text-2xl mr-3">💡</span>
+                {/* <span className="text-2xl mr-3">💡</span> */}
                 <div>
                   <h4
                     className="font-semibold text-blue-800 mb-1"
@@ -266,7 +266,10 @@ export const DistribucionComidas = ({ caloriasObjetivo, fontSize = 14 }) => {
                   >
                     Consejo de distribución
                   </h4>
-                  <p className="text-blue-700" style={smallTextStyle}>
+                  <p
+                    className="text-blue-700 text-justify"
+                    style={smallTextStyle}
+                  >
                     Distribuir las calorías en {numeroComidas} comidas ayuda a
                     mantener estables los niveles de energía durante el día y
                     evita picos de hambre.
@@ -277,48 +280,23 @@ export const DistribucionComidas = ({ caloriasObjetivo, fontSize = 14 }) => {
 
             <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-xl border border-green-100 shadow-sm">
               <div className="flex items-start">
-                <span className="text-2xl mr-3">⚖️</span>
+                {/* <span className="text-2xl mr-3">⚖️</span> */}
                 <div>
                   <h4
-                    className="font-semibold text-green-800 mb-1"
+                    className="font-semibold text-green-800 mb-1 text-justify"
                     style={textStyle}
                   >
                     Personalización
                   </h4>
-                  <p className="text-green-700" style={smallTextStyle}>
+                  <p
+                    className="text-green-700 text-justify"
+                    style={smallTextStyle}
+                  >
                     Estos porcentajes son recomendaciones generales. Ajusta
                     según tus preferencias, horarios y necesidades personales.
                   </p>
                 </div>
               </div>
-            </div>
-          </div>
-
-          {/* Barra de progreso visual */}
-          <div className="mt-6">
-            <h4 className="font-semibold text-gray-700 mb-3" style={textStyle}>
-              Distribución visual:
-            </h4>
-            <div className="flex h-6 bg-gray-200 rounded-full overflow-hidden shadow-inner">
-              {comidasConCalorias.map((comida, index) => (
-                <div
-                  key={index}
-                  className={`h-full transition-all duration-500 ease-out ${comida.color} ${comida.borderColor} border-r`}
-                  style={{ width: `${comida.porcentaje}%` }}
-                  title={`${comida.nombre}: ${comida.porcentaje}%`}
-                />
-              ))}
-            </div>
-            <div className="flex justify-between mt-2">
-              {comidasConCalorias.map((comida, index) => (
-                <span
-                  key={index}
-                  className={`text-xs ${comida.textColor}`}
-                  style={smallTextStyle}
-                >
-                  {comida.porcentaje}%
-                </span>
-              ))}
             </div>
           </div>
         </>

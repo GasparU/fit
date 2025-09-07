@@ -18,7 +18,10 @@ export const BusquedaComida = ({
   setFiltroSaciedad,
   filtroGlucemia,
   setFiltroGlucemia,
-  fontSize = 14
+  fontSize = 14,
+  onRemoveFood,
+  onUpdateQuantity,
+  onFoodSelect,
 }) => {
   // Estilos dinámicos
   const textStyle = {
@@ -45,29 +48,30 @@ export const BusquedaComida = ({
   }, [searchTerm, filtroSaciedad, filtroGlucemia]);
 
   // Mover alimento en la lista
- const handleDragEnd = (result) => {
-   if (!result.destination) return;
+  const handleDragEnd = (result) => {
+    if (!result.destination) return;
 
-   const items = Array.from(selectedFoods);
-   const [reorderedItem] = items.splice(result.source.index, 1);
-   items.splice(result.destination.index, 0, reorderedItem);
+    const items = Array.from(selectedFoods);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
 
-   setSelectedFoods(items);
- };
+    setSelectedFoods(items);
+  };
 
   // Manejar selección de alimento
   const handleFoodSelect = (food) => {
-    setSelectedFoods((prev) => [...prev, { ...food, cantidad: 100 }]);
+    onFoodSelect(food); 
     setSearchTerm("");
   };
 
   // Manejar cambio de cantidad
   const handleCantidadChange = (index, cantidad) => {
-    setSelectedFoods((prev) =>
-      prev.map((food, i) =>
-        i === index ? { ...food, cantidad: Math.max(1, cantidad) } : food
-      )
-    );
+    onUpdateQuantity(index, cantidad);
+  };
+
+  // Reemplazar handleRemoveFood
+  const handleRemoveFood = (index) => {
+    onRemoveFood(index);
   };
 
   // Manejar focus en input
@@ -195,6 +199,7 @@ export const BusquedaComida = ({
                 >
                   {selectedFoods.map((food, index) => (
                     <DraggableFoodItem
+                      fontSize={fontSize}
                       key={index}
                       index={index}
                       food={food}
@@ -202,6 +207,7 @@ export const BusquedaComida = ({
                       handleInputFocus={handleInputFocus}
                       handleInputBlur={handleInputBlur}
                       setSelectedFoods={setSelectedFoods}
+                      onRemove={() => handleRemoveFood(index)}
                       textStyle={textStyle}
                       smallTextStyle={smallTextStyle}
                     />

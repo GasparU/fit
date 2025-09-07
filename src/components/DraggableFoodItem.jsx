@@ -4,13 +4,14 @@ import { normalizarValor, safeParseFloat } from "../utils/foodFilters";
 
 export const DraggableFoodItem = ({
   food,
-  index,
+  index,fontSize,
   handleCantidadChange,
   handleInputFocus,
   handleInputBlur,
-  setSelectedFoods,
+  // setSelectedFoods,
   textStyle,
   smallTextStyle,
+  onRemove,
 }) => {
   const factor = food.cantidad / 100;
   const energia = (safeParseFloat(food.energia) * factor).toFixed(0);
@@ -50,10 +51,10 @@ export const DraggableFoodItem = ({
             <div className="flex items-center space-x-2 ml-2">
               <div className="bg-blue-50 px-2 py-auto rounded-md">
                 <span
-                  className="text-blue-700 font-medium"
+                  className="text-blue-700 font-medium py-20"
                   style={{
                     ...smallTextStyle,
-                    fontSize: `${parseInt(smallTextStyle.fontSize) - 1}px`,
+                    fontSize: `${parseInt(fontSize) - 1}px`,
                   }}
                 >
                   {energia} kcal
@@ -61,12 +62,7 @@ export const DraggableFoodItem = ({
               </div>
 
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedFoods((prev) =>
-                    prev.filter((_, i) => i !== index)
-                  );
-                }}
+                onClick={onRemove}
                 className="text-gray-400 hover:text-red-400 transition-colors duration-150  font-bold"
                 style={smallTextStyle}
                 title="Eliminar"
@@ -81,10 +77,10 @@ export const DraggableFoodItem = ({
             {/* Control de cantidad */}
             <div className="flex items-center space-x-2 ">
               <span
-                className="text-gray-600 font-medium"
+                className="text-gray-600 font-medium text-2xl"
                 style={{
                   ...smallTextStyle,
-                  fontSize: `${parseInt(smallTextStyle.fontSize) - 1}px`,
+                  fontSize: `${parseInt(fontSize) - 1}px`,
                 }}
               >
                 Cantidad:
@@ -102,14 +98,14 @@ export const DraggableFoodItem = ({
                 className="w-12 border border-gray-200 rounded-md py-0.5 px-1.5 text-center focus:ring-1 focus:ring-blue-200 focus:border-blue-200"
                 style={{
                   ...smallTextStyle,
-                  fontSize: `${parseInt(smallTextStyle.fontSize) - 1}px`,
+                  fontSize: `${parseInt(fontSize) - 1}px`,
                 }}
               />
               <span
                 className="text-gray-500 font-medium"
                 style={{
                   ...smallTextStyle,
-                  fontSize: `${parseInt(smallTextStyle.fontSize) - 1}px`,
+                  fontSize: `${parseInt(fontSize) - 1}px`,
                 }}
               >
                 g
@@ -131,7 +127,7 @@ export const DraggableFoodItem = ({
                       ? "bg-yellow-50 text-yellow-600"
                       : "bg-red-50 text-red-600"
                   }`}
-                  style={{ fontSize: "9px" }}
+                  style={{ fontSize: `${fontSize - 1}px` }}
                   title={`Saciedad: ${food.saciedad}`}
                 >
                   Saciedad
@@ -151,7 +147,7 @@ export const DraggableFoodItem = ({
                       ? "bg-orange-50 text-orange-600"
                       : "bg-green-50 text-green-600"
                   }`}
-                  style={{ fontSize: "9px" }}
+                  style={{ fontSize: `${fontSize - 1}px` }}
                   title={`Glucemia: ${food.glucemia}`}
                 >
                   Glucemia
