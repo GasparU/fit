@@ -17,6 +17,7 @@ import Header from "../components/Header";
 import { useAuth } from "../hooks/useAuth";
 import { useUserProfile } from "../hooks/useUserProfile";
 
+
 export const Home = () => {
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
@@ -90,20 +91,6 @@ export const Home = () => {
     await updateFoodQuantity(food.id, cantidad);
   };
 
-  // En handleRemoveFood
-  // const handleRemoveFood = async (index) => {
-  //   const foodToRemove = selectedFoods[index];
-  //   const newFoods = selectedFoods.filter((_, i) => i !== index);
-  //   setSelectedFoods(newFoods);
-
-  //   // Eliminar de Supabase
-  //   const foodId =
-  //     foodToRemove.food_id ||
-  //     foodToRemove.CODIGO ||
-  //     foodToRemove.id ||
-  //     foodToRemove.nombre_alimento;
-  //   await removeSelectedFood(foodId);
-  // };
   const handleRemoveFood = async (index) => {
     const foodToRemove = selectedFoods[index];
 
@@ -196,6 +183,7 @@ export const Home = () => {
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-cyan-50 p-2 md:p-4">
       {/* Encabezado con colores llamativos */}
       <Header user={user} />
+      
       <Buttons
         fontSize={fontSize}
         handleUserDataChange={handleUserDataChange}
