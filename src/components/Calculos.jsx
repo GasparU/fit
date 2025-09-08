@@ -1,5 +1,5 @@
 import { useState } from "react";
-import imgObjetivo from "/objetivos.png";
+
 
 export const Calculos = () => {
   const [peso, setPeso] = useState("");
