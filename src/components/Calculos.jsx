@@ -1,10 +1,13 @@
 import { useState } from "react";
-import imgObjetivo from '/objetivos.png'
+import imgObjetivo from "/objetivos.png";
 
 export const Calculos = () => {
   const [peso, setPeso] = useState("");
   const [repeticiones, setRepeticiones] = useState("");
   const [resultados, setResultados] = useState({});
+  const [objetivo, setObjetivo] = useState("");
+  const [porcentaje, setPorcentaje] = useState("");
+  const [resultadosObjetivo, setResultadosObjetivo] = useState({});
 
   const calcular1RM = () => {
     const P = parseFloat(peso);
@@ -27,12 +30,35 @@ export const Calculos = () => {
     };
 
     setResultados(calculos);
+
+    // Calcular pesos según objetivo si está seleccionado
+    if (objetivo && porcentaje) {
+      const porcentajeNum = parseFloat(porcentaje);
+      const resultadosObj = {};
+
+      Object.keys(calculos).forEach((key) => {
+        resultadosObj[key] = (calculos[key] * porcentajeNum) / 100;
+      });
+
+      setResultadosObjetivo(resultadosObj);
+    } else {
+      setResultadosObjetivo({});
+    }
   };
 
   const reiniciarCalculos = () => {
     setPeso("");
     setRepeticiones("");
     setResultados({});
+    setObjetivo("");
+    setPorcentaje("");
+    setResultadosObjetivo({});
+  };
+
+  const handleObjetivoChange = (e) => {
+    const value = e.target.value;
+    setObjetivo(value);
+    setPorcentaje(""); // Resetear porcentaje al cambiar objetivo
   };
 
   const formulas = [
@@ -40,12 +66,12 @@ export const Calculos = () => {
       id: "epley",
       nombre: "Epley",
       formula: "1RM = P × (1 + (0.033 × R))",
-      descripcion: "Precisa 10-15 reps",
+      descripcion: "Bastante Precisa cuando 10 < R < 15",
     },
     {
       id: "lander",
       nombre: "Lander",
-      formula: "1RM = (100 × P) / (101.3 - (2.67123 × R))",
+      formula: "1RM = (100 × P) / (101.3 - (2.67123 * R))",
       descripcion: "Fórmula general",
     },
     {
@@ -70,7 +96,7 @@ export const Calculos = () => {
       id: "brzycki",
       nombre: "Brzycki",
       formula: "1RM = P / (1.0278 - (0.0278 × R))",
-      descripcion: "Precisa R ≤ 10",
+      descripcion: "La más precisa cuando R ≤ 10",
     },
     {
       id: "wathen",
@@ -143,6 +169,74 @@ export const Calculos = () => {
               </button>
             </div>
           </div>
+          <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Objetivo *
+              </label>
+              <select
+                value={objetivo}
+                onChange={handleObjetivoChange}
+                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              >
+                <option value="">Seleccionar objetivo</option>
+                <option value="resistencia">Resistencia</option>
+                <option value="hipertrofia">Hipertrofia</option>
+                <option value="fuerza">Fuerza</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Porcentaje (
+                {objetivo
+                  ? `${
+                      objetivo === "resistencia"
+                        ? "40-60%"
+                        : objetivo === "hipertrofia"
+                        ? "60-80%"
+                        : "80-100%"
+                    }`
+                  : "Selecciona objetivo"}
+                ) *
+              </label>
+              <select
+                value={porcentaje}
+                onChange={(e) => setPorcentaje(e.target.value)}
+                disabled={!objetivo}
+                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent disabled:opacity-50"
+              >
+                <option value="">Seleccionar %</option>
+                {objetivo === "resistencia" && (
+                  <>
+                    <option value="40">40%</option>
+                    <option value="45">45%</option>
+                    <option value="50">50%</option>
+                    <option value="55">55%</option>
+                    <option value="60">60%</option>
+                  </>
+                )}
+                {objetivo === "hipertrofia" && (
+                  <>
+                    <option value="60">60%</option>
+                    <option value="65">65%</option>
+                    <option value="70">70%</option>
+                    <option value="75">75%</option>
+                    <option value="80">80%</option>
+                  </>
+                )}
+                {objetivo === "fuerza" && (
+                  <>
+                    <option value="80">80%</option>
+                    <option value="85">85%</option>
+                    <option value="90">90%</option>
+                    <option value="95">95%</option>
+                    <option value="100">100%</option>
+                  </>
+                )}
+              </select>
+            </div>
+          </div>
         </div>
 
         {/* Resultados */}
@@ -157,11 +251,26 @@ export const Calculos = () => {
                   key={formula.id}
                   className="bg-gray-50 rounded-lg p-4 border border-gray-200"
                 >
-                  <h3 className="font-semibold text-green-600 text-lg mb-2">
-                    {formula.nombre}
-                  </h3>
-                  <div className="text-2xl font-bold text-gray-800 mb-2">
-                    {resultados[formula.id].toFixed(1)} kg
+                  <div className="flex justify-between content-center">
+                    <div>
+                      <h3 className="font-semibold text-green-600 text-lg mb-2">
+                        {formula.nombre}
+                      </h3>
+                      <div className="text-2xl font-bold text-gray-800 mb-2">
+                        {resultados[formula.id].toFixed(1)} kg
+                      </div>
+                    </div>
+                    {resultadosObjetivo[formula.id] && (
+                      <div className="border-gray-200 justify-items-center pt-0">
+                        <h4 className="font-semibold text-blue-600 text-lg mb-1">
+                          {objetivo.charAt(0).toUpperCase() + objetivo.slice(1)}{" "}
+                          {/* ({porcentaje}%) */}
+                        </h4>
+                        <div className="text-lg font-bold text-blue-800 content-center mt-4">
+                          {resultadosObjetivo[formula.id].toFixed(1)} kg
+                        </div>
+                      </div>
+                    )}
                   </div>
                   <div className="text-sm text-gray-600 bg-white p-2 rounded border border-gray-200 mb-2">
                     {formula.formula}
@@ -194,7 +303,8 @@ export const Calculos = () => {
                   </div>
                   <p className="text-xs text-gray-600">{formula.descripcion}</p>
                   <div className="text-xs text-gray-500 mt-1">
-                    <strong>Variables:</strong> P = Peso, R = Repeticiones
+                    <strong>Variables:</strong> P = Peso, R = Repeticiones al
+                    fallo
                   </div>
                 </div>
               ))}
