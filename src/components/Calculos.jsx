@@ -317,7 +317,7 @@ export const Calculos = () => {
             </h2>
             <div className="flex justify-center">
               <img
-                src={objetivosImg}
+                src="/public/image2vector.svg"
                 alt="Tabla de objetivos de entrenamiento por porcentaje de 1RM"
                 className="w-full max-w-md h-auto rounded-lg shadow-sm"
               />
