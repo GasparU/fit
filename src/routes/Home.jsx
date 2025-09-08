@@ -13,7 +13,6 @@ import { FrecuenciaCardiacaUser } from "./Elements/FrecuenciaCardiacaUser";
 import { ObjetivosPlanUser } from "./Elements/ObjetivosPlanUser";
 import { DistribucionMacronutrientes } from "./Elements/DistribucionMacronutrientes";
 import { useDynamicStyles } from './../hooks/useDynamicStyles';
-import Header from "../components/Header";
 import { useAuth } from "../hooks/useAuth";
 import { useUserProfile } from "../hooks/useUserProfile";
 
@@ -181,13 +180,9 @@ export const Home = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-cyan-50 p-2 md:p-4">
-      {/* Encabezado con colores llamativos */}
-      <Header user={user} />
       
       <Buttons
         fontSize={fontSize}
-        handleUserDataChange={handleUserDataChange}
-        userData={userData}
         setFontSize={setFontSize}
       />
 

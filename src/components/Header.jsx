@@ -1,20 +1,25 @@
 
 
 import { FaUser, FaSignOutAlt, FaDumbbell } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { supabase } from '../supabase/supabaseClient';
+import { Buttons } from '../routes/Elements/Buttons';
 
 // Cambia a export default
 const Header = ({ user }) => {
+  // Función para determinar si un enlace está activo
+  const isActive = (path) => {
+    return location.pathname === path;
+  };
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-      navigate('/login');
+      navigate("/login");
     } catch (error) {
-      console.error('Error al cerrar sesión:', error.message);
+      console.error("Error al cerrar sesión:", error.message);
     }
   };
 
@@ -22,6 +27,8 @@ const Header = ({ user }) => {
     <header className="bg-gradient-to-r from-green-500 to-teal-500 shadow-lg">
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
+
+          <Buttons/>
           {/* Logo */}
           <div className="flex items-center space-x-3">
             <FaDumbbell className="text-white text-2xl" />
@@ -37,7 +44,7 @@ const Header = ({ user }) => {
                   {user.email || user.user_metadata?.full_name}
                 </span>
               </div>
-              
+
               <button
                 onClick={handleLogout}
                 className="flex items-center space-x-2 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg transition-all duration-300 group"

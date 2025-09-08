@@ -7,6 +7,8 @@ import Login from "./routes/Login";
 import UpdatePassword from "./routes/UpdatePassword";
 import { useAuth } from "./hooks/useAuth";
 import { useEffect, useState } from "react";
+import { Calculos } from "./components/Calculos";
+import { Navbar } from "./components/Navbar";
 
 function App() {
   const { user, loading } = useAuth();
@@ -34,6 +36,7 @@ function App() {
 
   return (
     <DndProvider backend={HTML5Backend}>
+      {user && !isRecoveryFlow && <Navbar />}
       <Routes>
         <Route
           path="/"
@@ -59,6 +62,16 @@ function App() {
               <UpdatePassword />
             ) : user ? (
               <Navigate to="/" replace />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/calculos"
+          element={
+            user && !isRecoveryFlow ? (
+              <Calculos />
             ) : (
               <Navigate to="/login" replace />
             )

@@ -32,7 +32,7 @@ export const useAuth = () => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event);
+  
       setUser(session?.user ?? null);
       setLoading(false);
     });
