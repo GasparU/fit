@@ -1,5 +1,5 @@
 import { useState } from "react";
-import objetivos from '../../public/objetivos.png'
+import objetivosImg from '/objetivos.png'
 
 
 export const Calculos = () => {
@@ -317,7 +317,7 @@ export const Calculos = () => {
             </h2>
             <div className="flex justify-center">
               <img
-                src={objetivos}
+                src={`${objetivosImg}?v=1`}
                 alt="Tabla de objetivos de entrenamiento por porcentaje de 1RM"
                 className="w-full max-w-md h-auto rounded-lg shadow-sm"
               />
