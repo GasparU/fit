@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import logo from '/image2vector.svg'
 
 
 export const Calculos = () => {
@@ -141,7 +141,7 @@ export const Calculos = () => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Repeticiones *
+                Repeticiones al fallo*
               </label>
               <input
                 type="number"
@@ -317,7 +317,7 @@ export const Calculos = () => {
             </h2>
             <div className="flex justify-center">
               <img
-                src="/image2vector.svg"
+                src={logo}
                 alt="Tabla de objetivos de entrenamiento por porcentaje de 1RM"
                 className="w-full max-w-md h-auto rounded-lg shadow-sm"
               />
