@@ -1,4 +1,5 @@
 import { useState } from "react";
+import imgObj from '/objetivos.png'
 
 export const Calculos = () => {
   const [peso, setPeso] = useState("");
@@ -315,7 +316,7 @@ export const Calculos = () => {
             </h2>
             <div className="flex justify-center">
               <img
-                src="/image2vector.svg"
+                src={imgObj}
                 alt="Tabla de objetivos de entrenamiento por porcentaje de 1RM"
                 className="w-full max-w-md h-auto rounded-lg shadow-sm"
               />
